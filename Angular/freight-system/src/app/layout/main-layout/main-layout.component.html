@@ -1,0 +1,26 @@
+<div class="layout-wrapper">
+  <app-header *ngIf="showHeader" (toggleSidebar)="toggleSidebar()"></app-header>
+
+  <mat-sidenav-container
+    class="sidenav-container"
+    [ngClass]="{ 'with-header': showHeader }"
+  >
+    <mat-sidenav
+      #sidenav
+      class="sidenav"
+      mode="side"
+      [opened]="sidenavOpened"
+      *ngIf="showSidebar"
+    >
+      <app-sidebar></app-sidebar>
+    </mat-sidenav>
+
+    <mat-sidenav-content class="main-content">
+      <main>
+        <router-outlet></router-outlet>
+      </main>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+
+  <app-footer *ngIf="showFooter"></app-footer>
+</div>

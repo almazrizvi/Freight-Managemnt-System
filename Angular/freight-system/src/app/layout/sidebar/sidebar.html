@@ -1,0 +1,38 @@
+<nav class="sidebar-nav">
+  <h2 class="nav-title">Menu</h2>
+  <mat-nav-list>
+    <!-- Regular menu items without children -->
+    <mat-list-item
+      *ngFor="let item of menuItems"
+      [routerLink]="!item.children ? (item.route || item.angularRoute) : null"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: false }"
+      class="menu-item"
+      [class.has-children]="item.children && item.children.length > 0"
+      (click)="toggleSubmenu(item)"
+    >
+      <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+      <span matListItemTitle>{{ item.label || item.title }}</span>
+      <mat-icon *ngIf="item.children && item.children.length > 0" class="expand-icon">
+        {{ isSubmenuOpen(item) ? 'expand_less' : 'expand_more' }}
+      </mat-icon>
+    </mat-list-item>
+
+    <!-- Submenu items -->
+    <ng-container *ngFor="let item of menuItems">
+      <mat-list-item
+        *ngFor="let subitem of item.children"
+        [routerLink]="subitem.route || subitem.angularRoute"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        class="submenu-item"
+        [@expandCollapse]="isSubmenuOpen(item) ? 'open' : 'closed'"
+      >
+        <span matListItemTitle class="submenu-label">
+          <mat-icon class="submenu-icon">{{ subitem.icon }}</mat-icon>
+          {{ subitem.label || subitem.title }}
+        </span>
+      </mat-list-item>
+    </ng-container>
+  </mat-nav-list>
+</nav>

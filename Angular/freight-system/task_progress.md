@@ -1,0 +1,6 @@
+- [x] Implement login functionality and display AWB numbers after successful login
+- [x] Set up necessary files for user registration and management
+- [ ] Implement main functionality of the application
+- [ ] Handle edge cases and errors
+- [ ] Test the implementation thoroughly
+- [ ] Verify results and ensure everything is working as expected
