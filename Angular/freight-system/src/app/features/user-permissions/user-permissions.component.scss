@@ -1,0 +1,140 @@
+.permissions-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .permissions-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+
+    .back-button {
+      color: #3f51b5;
+    }
+
+    h1 {
+      margin: 0;
+      flex: 1;
+      font-size: 28px;
+      font-weight: 500;
+      color: #213454;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    }
+  }
+
+  .permissions-wrapper {
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+
+    .loading {
+      padding: 32px;
+      text-align: center;
+      color: #666;
+    }
+
+    .permissions-table {
+      width: 100%;
+
+      th {
+        background-color: #f5f5f5;
+        border-bottom: 2px solid #e0e0e0;
+        font-weight: 600;
+        color: #213454;
+        padding: 16px;
+        text-align: left;
+      }
+
+      td {
+        padding: 16px;
+        border-bottom: 1px solid #e0e0e0;
+        color: #333;
+      }
+
+      tr:hover {
+        background-color: #fafafa;
+      }
+
+      .permission-info {
+        h4 {
+          margin: 0;
+          font-size: 15px;
+          font-weight: 600;
+          color: #213454;
+        }
+
+        p {
+          margin: 4px 0 0 0;
+          font-size: 12px;
+          color: #666;
+        }
+      }
+
+      mat-checkbox {
+        display: flex;
+        justify-content: center;
+      }
+    }
+
+    .no-permissions {
+      padding: 32px;
+      text-align: center;
+      color: #666;
+
+      p {
+        margin: 0;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .permissions-container {
+    padding: 16px;
+
+    .permissions-header {
+      flex-direction: column;
+      align-items: flex-start;
+
+      h1 {
+        font-size: 22px;
+      }
+
+      .actions {
+        width: 100%;
+        flex-direction: column;
+
+        button {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    }
+
+    .permissions-wrapper {
+      .permissions-table {
+        th {
+          padding: 12px;
+          font-size: 12px;
+        }
+
+        td {
+          padding: 12px;
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}

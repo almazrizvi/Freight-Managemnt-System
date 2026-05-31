@@ -1,0 +1,108 @@
+<div class="users-container">
+  <div class="users-header">
+    <h1>User Management</h1>
+    <button mat-raised-button color="primary" (click)="createNewUser()">
+      <mat-icon>add</mat-icon>
+      Create New User
+    </button>
+  </div>
+
+  <div class="users-table-wrapper">
+    <div *ngIf="isLoading" class="loading">Loading users...</div>
+    
+    <div class="filters-section" *ngIf="!isLoading && users.length > 0">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search users</mat-label>
+        <input matInput [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()" placeholder="Email or name">
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filter by type</mat-label>
+        <mat-select [(ngModel)]="selectedUserType" (ngModelChange)="onFilterChange()">
+          <mat-option value="">All Types</mat-option>
+          <mat-option value="INTERNAL">Internal</mat-option>
+          <mat-option value="CUSTOMER">Customer</mat-option>
+          <mat-option value="DRIVER">Driver</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-stroked-button (click)="clearFilters()" *ngIf="searchQuery || selectedUserType">
+        <mat-icon>clear</mat-icon>
+        Clear Filters
+      </button>
+    </div>
+
+    <table mat-table [dataSource]="filteredUsers" class="users-table" *ngIf="!isLoading && filteredUsers.length > 0">
+      <!-- Email Column -->
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let user">{{ user.email }}</td>
+      </ng-container>
+
+      <!-- Full Name Column -->
+      <ng-container matColumnDef="fullName">
+        <th mat-header-cell *matHeaderCellDef>Full Name</th>
+        <td mat-cell *matCellDef="let user">{{ user.fullName }}</td>
+      </ng-container>
+
+      <!-- User Type Column -->
+      <ng-container matColumnDef="userType">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let user">
+          <span class="user-type" [ngClass]="'type-' + user.userType.toLowerCase()">
+            {{ user.userType }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Active Status Column -->
+      <ng-container matColumnDef="isActive">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let user">
+          <span class="status-badge" [ngClass]="user.isActive ? 'active' : 'inactive'">
+            {{ user.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Created At Column -->
+      <ng-container matColumnDef="createdAt">
+        <th mat-header-cell *matHeaderCellDef>Created</th>
+        <td mat-cell *matCellDef="let user">
+          {{ user.createdAt | date:'short' }}
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let user" class="actions-cell">
+          <button mat-icon-button [routerLink]="['/admin/users', user.id, 'edit']" 
+            matTooltip="Edit user">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button (click)="toggleStatus(user)" 
+            [matTooltip]="user.isActive ? 'Deactivate user' : 'Activate user'">
+            <mat-icon>{{ user.isActive ? 'toggle_on' : 'toggle_off' }}</mat-icon>
+          </button>
+          <button mat-icon-button (click)="deleteUser(user)" 
+            matTooltip="Delete user" color="warn">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <div *ngIf="!isLoading && users.length === 0" class="no-users">
+      <p>No users found. <a [routerLink]="['/admin/users/create']">Create one now</a></p>
+    </div>
+
+    <div *ngIf="!isLoading && users.length > 0 && filteredUsers.length === 0" class="no-results">
+      <p>No users match your search criteria.</p>
+    </div>
+  </div>
+</div>

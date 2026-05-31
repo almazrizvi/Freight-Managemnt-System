@@ -1,0 +1,54 @@
+<mat-toolbar color="primary" class="header-toolbar">
+  <div class="header-content">
+    <button mat-icon-button (click)="toggleSidebar.emit()" aria-label="Toggle sidebar" class="menu-button">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <div class="logo-section">
+      <span class="logo-icon">🚚</span>
+      <span class="logo-text">Freight System</span>
+    </div>
+
+    <div class="header-spacer"></div>
+
+    <div class="search-section">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input type="search" class="search-input" placeholder="Search..." />
+    </div>
+
+    <div class="header-actions">
+      <button mat-icon-button aria-label="Notifications">
+        <mat-icon matBadge="3" matBadgeColor="warn">notifications</mat-icon>
+      </button>
+
+      <button mat-icon-button [matMenuTriggerFor]="profileMenu" aria-label="Profile">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+
+      <mat-menu #profileMenu="matMenu">
+        <button mat-menu-item disabled *ngIf="currentUser">
+          <mat-icon>person</mat-icon>
+          <span>{{ currentUser.username }}</span>
+        </button>
+        
+        <mat-divider *ngIf="currentUser"></mat-divider>
+
+        <button mat-menu-item>
+          <mat-icon>person</mat-icon>
+          <span>Profile</span>
+        </button>
+        <button mat-menu-item>
+          <mat-icon>settings</mat-icon>
+          <span>Settings</span>
+        </button>
+        
+        <mat-divider></mat-divider>
+        
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+</mat-toolbar>
