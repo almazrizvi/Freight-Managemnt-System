@@ -7,7 +7,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.freight.management.user_service.user.access.service.AccessAdminService;
+import com.freight.management.user_service.user.access.service.AccessProfileService;
+import com.freight.management.user_service.user.dto.AdminUserRequest;
 import com.freight.management.user_service.user.model.User;
 import com.freight.management.user_service.user.repository.UserRepository;
 
@@ -15,21 +19,45 @@ import com.freight.management.user_service.user.repository.UserRepository;
 public class UserService {
 
 	private final UserRepository userRepository;
+	private final BCryptPasswordEncoder passwordEncoder;
+	private final AccessProfileService accessProfileService;
+	private final AccessAdminService accessAdminService;
 
-	public UserService(UserRepository userRepository) {
+	public UserService(
+			UserRepository userRepository,
+			BCryptPasswordEncoder passwordEncoder,
+			AccessProfileService accessProfileService,
+			AccessAdminService accessAdminService
+	) {
 		this.userRepository = userRepository;
+		this.passwordEncoder = passwordEncoder;
+		this.accessProfileService = accessProfileService;
+		this.accessAdminService = accessAdminService;
 	}
 
 	/**
 	 * Create a new user with email validation
 	 */
-	public User createUser(User user) {
-		if (userRepository.existsByEmail(user.getEmail())) {
+	public User createUser(AdminUserRequest request) {
+		if (userRepository.existsByEmail(request.getEmail())) {
 			throw new IllegalArgumentException("Email already exists");
 		}
-		user.setIsActive(true);
-		user.setUserType("INTERNAL");
-		return userRepository.save(user);
+		User user = new User();
+		user.setEmail(request.getEmail());
+		user.setFullName(request.getFullName());
+		user.setPasswordHash(passwordEncoder.encode(requirePassword(request.getPassword())));
+		user.setUserType(request.getUserType());
+		user.setIsActive(request.getIsActive() == null ? Boolean.TRUE : request.getIsActive());
+
+		User savedUser = userRepository.save(user);
+
+		if (request.getRoleCodes() != null && !request.getRoleCodes().isEmpty()) {
+			accessAdminService.assignRoles(savedUser.getId(), request.getRoleCodes());
+		} else {
+			accessProfileService.assignDefaultRole(savedUser);
+		}
+
+		return savedUser;
 	}
 
 	/**
@@ -54,33 +82,37 @@ public class UserService {
 	/**
 	 * Update user with email uniqueness validation
 	 */
-	public User updateUser(UUID id, User user) {
+	public User updateUser(UUID id, AdminUserRequest request) {
 		Optional<User> existingUser = userRepository.findById(id);
 		if (existingUser.isPresent()) {
 			User userToUpdate = existingUser.get();
 
 			// Check if email is being changed and if it already exists
-			if (user.getEmail() != null && !user.getEmail().equals(userToUpdate.getEmail())) {
-				if (userRepository.existsByEmail(user.getEmail())) {
+			if (request.getEmail() != null && !request.getEmail().equals(userToUpdate.getEmail())) {
+				if (userRepository.existsByEmail(request.getEmail())) {
 					throw new IllegalArgumentException("Email already exists");
 				}
-				userToUpdate.setEmail(user.getEmail());
+				userToUpdate.setEmail(request.getEmail());
 			}
 
-			if (user.getFullName() != null) {
-				userToUpdate.setFullName(user.getFullName());
+			if (request.getFullName() != null) {
+				userToUpdate.setFullName(request.getFullName());
 			}
-			if (user.getPasswordHash() != null) {
-				userToUpdate.setPasswordHash(user.getPasswordHash());
+			if (request.getPassword() != null && !request.getPassword().isBlank()) {
+				userToUpdate.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 			}
-			if (user.getUserType() != null) {
-				userToUpdate.setUserType(user.getUserType());
+			if (request.getUserType() != null) {
+				userToUpdate.setUserType(request.getUserType());
 			}
-			if (user.getIsActive() != null) {
-				userToUpdate.setIsActive(user.getIsActive());
+			if (request.getIsActive() != null) {
+				userToUpdate.setIsActive(request.getIsActive());
 			}
 
-			return userRepository.save(userToUpdate);
+			User updatedUser = userRepository.save(userToUpdate);
+			if (request.getRoleCodes() != null) {
+				accessAdminService.assignRoles(updatedUser.getId(), request.getRoleCodes());
+			}
+			return updatedUser;
 		}
 		return null;
 	}
@@ -143,5 +175,12 @@ public class UserService {
 	 */
 	public long getUserCount() {
 		return userRepository.findAll().stream().filter(user -> user.getDeletedAt() == null).count();
+	}
+
+	private String requirePassword(String password) {
+		if (password == null || password.isBlank()) {
+			throw new IllegalArgumentException("Password is required");
+		}
+		return password;
 	}
 }

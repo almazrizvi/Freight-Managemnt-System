@@ -45,7 +45,11 @@ public class User {
 	@PrePersist
 	protected void onCreate() {
 		createdAt = LocalDateTime.now();
-		isActive = true;
-		userType = "INTERNAL";
+		if (isActive == null) {
+			isActive = true;
+		}
+		if (userType == null) {
+			userType = "INTERNAL";
+		}
 	}
 }

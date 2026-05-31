@@ -11,13 +11,15 @@
 
       <mat-card-content>
         <h2>Sign In</h2>
-        <p class="demo-info">Demo credentials: <strong>demo</strong> / <strong>password</strong></p>
+        <p class="demo-info">
+          Uses the backend login when available. If the backend is offline, the UI falls back to a full-access local admin session for development.
+        </p>
 
         <form (ngSubmit)="login()" class="login-form">
           <mat-form-field class="full-width">
-            <mat-label>Username</mat-label>
-            <input matInput [(ngModel)]="username" name="username" required />
-            <mat-icon matSuffix>person</mat-icon>
+            <mat-label>Email</mat-label>
+            <input matInput [(ngModel)]="email" name="email" type="email" required />
+            <mat-icon matSuffix>alternate_email</mat-icon>
           </mat-form-field>
 
           <mat-form-field class="full-width">
@@ -32,10 +34,11 @@
           </div>
 
           <div class="button-group">
-            <button mat-raised-button color="primary" type="submit" class="full-width">
-              Sign In
+            <button mat-raised-button color="primary" type="submit" class="full-width" [disabled]="isSubmitting">
+              <mat-spinner *ngIf="isSubmitting" diameter="18"></mat-spinner>
+              <span *ngIf="!isSubmitting">Sign In</span>
             </button>
-            <button mat-stroked-button type="button" (click)="toggleRegister()" class="full-width">
+            <button mat-stroked-button type="button" (click)="toggleRegister()" class="full-width" [disabled]="isSubmitting">
               Create Account
             </button>
           </div>
@@ -57,9 +60,9 @@
 
         <form (ngSubmit)="register()" class="login-form">
           <mat-form-field class="full-width">
-            <mat-label>Username</mat-label>
-            <input matInput [(ngModel)]="regUsername" name="regUsername" required />
-            <mat-icon matSuffix>person</mat-icon>
+            <mat-label>Email</mat-label>
+            <input matInput [(ngModel)]="regEmail" name="regEmail" type="email" required />
+            <mat-icon matSuffix>alternate_email</mat-icon>
           </mat-form-field>
 
           <mat-form-field class="full-width">
@@ -85,10 +88,11 @@
           </div>
 
           <div class="button-group">
-            <button mat-raised-button color="primary" type="submit" class="full-width">
-              Register
+            <button mat-raised-button color="primary" type="submit" class="full-width" [disabled]="isSubmitting">
+              <mat-spinner *ngIf="isSubmitting" diameter="18"></mat-spinner>
+              <span *ngIf="!isSubmitting">Register</span>
             </button>
-            <button mat-stroked-button type="button" (click)="toggleRegister()" class="full-width">
+            <button mat-stroked-button type="button" (click)="toggleRegister()" class="full-width" [disabled]="isSubmitting">
               Back to Login
             </button>
           </div>

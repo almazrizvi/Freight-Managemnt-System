@@ -1,140 +1,85 @@
 .permissions-container {
   padding: 24px;
-  max-width: 1200px;
+  max-width: 1440px;
   margin: 0 auto;
-
-  .permissions-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 32px;
-
-    .back-button {
-      color: #3f51b5;
-    }
-
-    h1 {
-      margin: 0;
-      flex: 1;
-      font-size: 28px;
-      font-weight: 500;
-      color: #213454;
-    }
-
-    .actions {
-      display: flex;
-      gap: 8px;
-
-      button {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-    }
-  }
-
-  .permissions-wrapper {
-    background: white;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow-x: auto;
-
-    .loading {
-      padding: 32px;
-      text-align: center;
-      color: #666;
-    }
-
-    .permissions-table {
-      width: 100%;
-
-      th {
-        background-color: #f5f5f5;
-        border-bottom: 2px solid #e0e0e0;
-        font-weight: 600;
-        color: #213454;
-        padding: 16px;
-        text-align: left;
-      }
-
-      td {
-        padding: 16px;
-        border-bottom: 1px solid #e0e0e0;
-        color: #333;
-      }
-
-      tr:hover {
-        background-color: #fafafa;
-      }
-
-      .permission-info {
-        h4 {
-          margin: 0;
-          font-size: 15px;
-          font-weight: 600;
-          color: #213454;
-        }
-
-        p {
-          margin: 4px 0 0 0;
-          font-size: 12px;
-          color: #666;
-        }
-      }
-
-      mat-checkbox {
-        display: flex;
-        justify-content: center;
-      }
-    }
-
-    .no-permissions {
-      padding: 32px;
-      text-align: center;
-      color: #666;
-
-      p {
-        margin: 0;
-      }
-    }
-  }
 }
 
-@media (max-width: 768px) {
-  .permissions-container {
-    padding: 16px;
+.permissions-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
 
-    .permissions-header {
-      flex-direction: column;
-      align-items: flex-start;
+.permissions-header h1 {
+  margin: 0 0 8px;
+  color: #213454;
+}
 
-      h1 {
-        font-size: 22px;
-      }
+.permissions-header p {
+  margin: 0;
+  color: #5b6579;
+}
 
-      .actions {
-        width: 100%;
-        flex-direction: column;
+.role-picker {
+  margin-left: auto;
+  min-width: 260px;
+}
 
-        button {
-          width: 100%;
-          justify-content: center;
-        }
-      }
-    }
+.back-button {
+  color: #3f51b5;
+}
 
-    .permissions-wrapper {
-      .permissions-table {
-        th {
-          padding: 12px;
-          font-size: 12px;
-        }
+.permissions-wrapper {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(33, 52, 84, 0.08);
+  overflow-x: auto;
+}
 
-        td {
-          padding: 12px;
-          font-size: 12px;
-        }
-      }
-    }
-  }
+.loading,
+.no-permissions {
+  padding: 32px;
+  text-align: center;
+  color: #5b6579;
+}
+
+.permissions-table {
+  width: 100%;
+}
+
+.permissions-table th {
+  background: #f5f7fb;
+  color: #213454;
+  font-weight: 600;
+}
+
+.permissions-table th,
+.permissions-table td {
+  padding: 16px;
+}
+
+.permission-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.permission-info span,
+.permission-info small {
+  color: #5b6579;
+}
+
+.actions-section {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #e9edf5;
+}
+
+.actions-section button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }

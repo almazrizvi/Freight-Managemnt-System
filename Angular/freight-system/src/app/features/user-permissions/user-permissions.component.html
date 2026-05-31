@@ -3,8 +3,50 @@
     <button mat-icon-button (click)="goBack()" class="back-button">
       <mat-icon>arrow_back</mat-icon>
     </button>
-    <h1>User Permissions Management</h1>
-    <div class="actions">
+    <div>
+      <h1>User Permissions</h1>
+      <p>Configure module-level read, create, update, delete, and approve actions for each role.</p>
+    </div>
+    <mat-form-field appearance="outline" class="role-picker">
+      <mat-label>Role</mat-label>
+      <mat-select [(ngModel)]="selectedRoleCode" (ngModelChange)="onRoleChange()">
+        <mat-option *ngFor="let role of roles" [value]="role.roleCode">
+          {{ role.roleName }} ({{ role.roleCode }})
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="permissions-wrapper">
+    <div *ngIf="isLoading" class="loading">Loading permissions...</div>
+
+    <table mat-table [dataSource]="permissions" class="permissions-table" *ngIf="!isLoading && permissions.length > 0">
+      <ng-container matColumnDef="permission">
+        <th mat-header-cell *matHeaderCellDef>Module</th>
+        <td mat-cell *matCellDef="let permission">
+          <div class="permission-info">
+            <strong>{{ permission.title }}</strong>
+            <span>{{ permission.description }}</span>
+            <small *ngIf="permission.route">{{ permission.route }}</small>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container *ngFor="let action of availableActions" [matColumnDef]="action">
+        <th mat-header-cell *matHeaderCellDef>{{ action }}</th>
+        <td mat-cell *matCellDef="let permission">
+          <mat-checkbox
+            [checked]="hasAction(permission, action)"
+            (change)="togglePermission(permission, action, $event.checked)"
+          ></mat-checkbox>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <div class="actions-section" *ngIf="!isLoading && permissions.length > 0">
       <button mat-stroked-button (click)="resetPermissions()">
         <mat-icon>refresh</mat-icon>
         Reset
@@ -14,53 +56,9 @@
         Save Permissions
       </button>
     </div>
-  </div>
-
-  <div class="permissions-wrapper">
-    <div *ngIf="isLoading" class="loading">Loading permissions...</div>
-
-    <table mat-table [dataSource]="permissions" class="permissions-table" *ngIf="!isLoading && permissions.length > 0">
-      <!-- Permission Column -->
-      <ng-container matColumnDef="permission">
-        <th mat-header-cell *matHeaderCellDef>Permission</th>
-        <td mat-cell *matCellDef="let perm">
-          <div class="permission-info">
-            <h4>{{ perm.name }}</h4>
-            <p>{{ perm.description }}</p>
-          </div>
-        </td>
-      </ng-container>
-
-      <!-- Read Column -->
-      <ng-container matColumnDef="read">
-        <th mat-header-cell *matHeaderCellDef>Read</th>
-        <td mat-cell *matCellDef="let perm">
-          <mat-checkbox [(ngModel)]="perm.read"></mat-checkbox>
-        </td>
-      </ng-container>
-
-      <!-- Write Column -->
-      <ng-container matColumnDef="write">
-        <th mat-header-cell *matHeaderCellDef>Write</th>
-        <td mat-cell *matCellDef="let perm">
-          <mat-checkbox [(ngModel)]="perm.write"></mat-checkbox>
-        </td>
-      </ng-container>
-
-      <!-- Delete Column -->
-      <ng-container matColumnDef="delete">
-        <th mat-header-cell *matHeaderCellDef>Delete</th>
-        <td mat-cell *matCellDef="let perm">
-          <mat-checkbox [(ngModel)]="perm.delete"></mat-checkbox>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
 
     <div *ngIf="!isLoading && permissions.length === 0" class="no-permissions">
-      <p>No permissions configured yet.</p>
+      <p>No permissions configured for this role yet.</p>
     </div>
   </div>
 </div>

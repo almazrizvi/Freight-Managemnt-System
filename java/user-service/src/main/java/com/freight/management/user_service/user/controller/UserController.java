@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.freight.management.user_service.user.model.User;
+import com.freight.management.user_service.user.dto.AdminUserRequest;
 import com.freight.management.user_service.user.service.UserService;
 
 @RestController
@@ -30,8 +31,8 @@ public class UserController {
 	 * Create a new user
 	 */
 	@PostMapping
-	public User createUser(@RequestBody User user) {
-		return userService.createUser(user);
+	public User createUser(@RequestBody AdminUserRequest request) {
+		return userService.createUser(request);
 	}
 
 	/**
@@ -54,8 +55,8 @@ public class UserController {
 	 * Update user
 	 */
 	@PutMapping("/{id}")
-	public User updateUser(@PathVariable UUID id, @RequestBody User user) {
-		return userService.updateUser(id, user);
+	public User updateUser(@PathVariable UUID id, @RequestBody AdminUserRequest request) {
+		return userService.updateUser(id, request);
 	}
 
 	/**

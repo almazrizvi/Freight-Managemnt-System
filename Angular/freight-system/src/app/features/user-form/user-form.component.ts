@@ -8,8 +8,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { User } from '../../core/user.model';
 import { UserService } from '../../core/user.service';
+import { RbacAdminService, RoleDefinition } from '../../core/rbac-admin.service';
 
 @Component({
   selector: 'app-user-form',
@@ -21,6 +23,7 @@ import { UserService } from '../../core/user.service';
     MatInputModule,
     MatButtonModule,
     MatSelectModule,
+    MatCheckboxModule,
     MatSnackBarModule,
     MatIconModule,
     RouterModule
@@ -34,10 +37,12 @@ export class UserFormComponent implements OnInit {
   isEditMode = false;
   userId?: string;
   userTypes = ['INTERNAL', 'CUSTOMER', 'DRIVER'];
+  roles: RoleDefinition[] = [];
 
   constructor(
     private formBuilder: FormBuilder,
     private userService: UserService,
+    private rbacAdminService: RbacAdminService,
     private snackBar: MatSnackBar,
     private router: Router,
     private route: ActivatedRoute
@@ -45,18 +50,28 @@ export class UserFormComponent implements OnInit {
     this.userForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       fullName: ['', Validators.required],
-      passwordHash: ['', Validators.required],
+      password: ['', Validators.required],
       userType: ['INTERNAL', Validators.required],
-      isActive: [true]
+      isActive: [true],
+      roleCodes: [[]]
     });
   }
 
   ngOnInit(): void {
+    this.loadRoles();
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode = true;
         this.userId = params['id'];
         this.loadUser();
+      }
+    });
+  }
+
+  loadRoles(): void {
+    this.rbacAdminService.getRoles().subscribe({
+      next: (roles) => {
+        this.roles = roles;
       }
     });
   }
@@ -74,11 +89,11 @@ export class UserFormComponent implements OnInit {
           isActive: user.isActive
         });
         if (this.isEditMode) {
-          this.userForm.get('passwordHash')?.clearAsyncValidators();
-          this.userForm.get('passwordHash')?.reset();
-          this.userForm.get('passwordHash')?.clearValidators();
-          this.userForm.get('passwordHash')?.updateValueAndValidity();
+          this.userForm.get('password')?.reset();
+          this.userForm.get('password')?.clearValidators();
+          this.userForm.get('password')?.updateValueAndValidity();
         }
+        this.loadUserRoles();
         setTimeout(() => {
           this.isLoading = false;
         });
@@ -89,6 +104,20 @@ export class UserFormComponent implements OnInit {
         this.router.navigate(['/admin/users']);
         setTimeout(() => {
           this.isLoading = false;
+        });
+      }
+    });
+  }
+
+  loadUserRoles(): void {
+    if (!this.userId) {
+      return;
+    }
+
+    this.rbacAdminService.getUserAccess(this.userId).subscribe({
+      next: (access) => {
+        this.userForm.patchValue({
+          roleCodes: access.roleCodes ?? []
         });
       }
     });
@@ -106,7 +135,7 @@ export class UserFormComponent implements OnInit {
     if (this.isEditMode && this.userId) {
       this.userService.updateUser(this.userId, userData).subscribe({
         next: () => {
-          this.snackBar.open('User updated successfully', 'Close', { duration: 3000 });
+          this.snackBar.open('User updated and roles synced successfully', 'Close', { duration: 3000 });
           this.router.navigate(['/admin/users']);
           setTimeout(() => {
             this.isLoading = false;
@@ -122,9 +151,13 @@ export class UserFormComponent implements OnInit {
       });
     } else {
       this.userService.createUser(userData).subscribe({
-        next: () => {
+        next: (createdUser) => {
           this.snackBar.open('User created successfully', 'Close', { duration: 3000 });
-          this.router.navigate(['/admin/users']);
+          this.router.navigate(['/admin/users/roles'], {
+            queryParams: {
+              user: createdUser.id
+            }
+          });
           setTimeout(() => {
             this.isLoading = false;
           });
