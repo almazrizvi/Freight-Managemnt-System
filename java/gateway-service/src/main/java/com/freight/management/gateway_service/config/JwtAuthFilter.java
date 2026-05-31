@@ -1,5 +1,6 @@
 package com.freight.management.gateway_service.config;
 
+import com.freight.management.core.constants.SecurityHeaders;
 import com.freight.management.gateway_service.util.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,20 +51,20 @@ public class JwtAuthFilter extends AbstractGatewayFilterFactory<JwtAuthFilter.Co
             }
 
             // Check if the request has Authorization header
-            if (!request.getHeaders().containsKey("Authorization")) {
+            if (!request.getHeaders().containsKey(SecurityHeaders.AUTHORIZATION)) {
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
                 return response.setComplete();
             }
 
-            String authHeader = request.getHeaders().get("Authorization").get(0);
+            String authHeader = request.getHeaders().getFirst(SecurityHeaders.AUTHORIZATION);
 
             // Validate Bearer token format
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            if (authHeader == null || !authHeader.startsWith(SecurityHeaders.BEARER_PREFIX)) {
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
                 return response.setComplete();
             }
 
-            String token = authHeader.substring(7);
+            String token = authHeader.substring(SecurityHeaders.BEARER_PREFIX.length());
 
             try {
                 // Validate JWT token
@@ -77,9 +78,9 @@ public class JwtAuthFilter extends AbstractGatewayFilterFactory<JwtAuthFilter.Co
                 String email = jwtTokenProvider.getEmailFromToken(token);
 
                 ServerHttpRequest modifiedRequest = request.mutate()
-                        .header("X-User-Id", userId)
-                        .header("X-User-Email", email)
-                        .header("X-JWT-Token", token)
+                        .header(SecurityHeaders.USER_ID, userId)
+                        .header(SecurityHeaders.USER_EMAIL, email)
+                        .header(SecurityHeaders.JWT_TOKEN, token)
                         .build();
 
                 return chain.filter(exchange.mutate().request(modifiedRequest).build());
