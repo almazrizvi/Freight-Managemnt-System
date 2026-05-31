@@ -7,7 +7,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatBadgeModule } from '@angular/material/badge';
 import { RouterModule, Router } from '@angular/router';
-import { AuthService, User } from '../../core/auth.service';
+import { AuthService } from '../../core/auth.service';
+import { AuthSession } from '../../core/auth.models';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -28,7 +29,7 @@ import { takeUntil } from 'rxjs/operators';
   styleUrls: ['./header.scss']
 })
 export class Header implements OnInit, OnDestroy {
-  currentUser: User | null = null;
+  currentUser: AuthSession | null = null;
   private destroy$ = new Subject<void>();
   @Output() toggleSidebar = new EventEmitter<void>();
 
@@ -50,6 +51,5 @@ export class Header implements OnInit, OnDestroy {
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/login']);
   }
 }

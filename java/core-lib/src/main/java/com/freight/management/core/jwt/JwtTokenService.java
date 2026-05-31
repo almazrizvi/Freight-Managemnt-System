@@ -10,6 +10,7 @@ import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Map;
 
 public class JwtTokenService {
 
@@ -22,9 +23,14 @@ public class JwtTokenService {
     }
 
     public String generateToken(String userId, String email) {
+        return generateToken(userId, email, Map.of());
+    }
+
+    public String generateToken(String userId, String email, Map<String, ?> extraClaims) {
         return Jwts.builder()
                 .subject(userId)
                 .claim(JwtClaimNames.EMAIL, email)
+                .claims(extraClaims)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expirationMillis))
                 .signWith(signingKey, Jwts.SIG.HS512)

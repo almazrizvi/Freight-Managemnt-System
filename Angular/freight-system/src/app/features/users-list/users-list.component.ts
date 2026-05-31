@@ -14,6 +14,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { RouterModule, Router } from '@angular/router';
 import { User } from '../../core/user.model';
 import { UserService } from '../../core/user.service';
+import { AuthService } from '../../core/auth.service';
+import { RbacAdminService, UserAccessSummary } from '../../core/rbac-admin.service';
 import { UserDeleteDialogComponent } from './user-delete-dialog/user-delete-dialog.component';
 
 @Component({
@@ -37,9 +39,9 @@ import { UserDeleteDialogComponent } from './user-delete-dialog/user-delete-dial
   styleUrls: ['./users-list.component.scss']
 })
 export class UsersListComponent implements OnInit {
-  users: User[] = [];
-  filteredUsers: User[] = [];
-  displayedColumns: string[] = ['email', 'fullName', 'userType', 'isActive', 'createdAt', 'actions'];
+  users: UserAccessSummary[] = [];
+  filteredUsers: UserAccessSummary[] = [];
+  displayedColumns: string[] = ['email', 'fullName', 'roles', 'userType', 'isActive', 'createdAt', 'actions'];
   isLoading = false;
   searchQuery = '';
   selectedUserType = '';
@@ -47,6 +49,8 @@ export class UsersListComponent implements OnInit {
 
   constructor(
     private userService: UserService,
+    private authService: AuthService,
+    private rbacAdminService: RbacAdminService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private router: Router
@@ -58,7 +62,7 @@ export class UsersListComponent implements OnInit {
 
   loadUsers(): void {
     this.isLoading = true;
-    this.userService.getAllUsers().subscribe({
+    this.rbacAdminService.getUserAccessList().subscribe({
       next: (users) => {
         this.users = users;
         this.applyFilters();
@@ -116,6 +120,12 @@ export class UsersListComponent implements OnInit {
     this.router.navigate(['/admin/users', user.id, 'edit']);
   }
 
+  manageRoles(user: UserAccessSummary): void {
+    this.router.navigate(['/admin/users/roles'], {
+      queryParams: { user: user.userId }
+    });
+  }
+
   deleteUser(user: User): void {
     const dialogRef = this.dialog.open(UserDeleteDialogComponent, {
       width: '400px',
@@ -132,7 +142,7 @@ export class UsersListComponent implements OnInit {
   private performDelete(user: User): void {
     if (!user.id) return;
     
-    const currentUserId = ''; // TODO: Get from auth service
+    const currentUserId = this.authService.getCurrentUser()?.userId ?? user.id;
     this.userService.deleteUser(user.id, currentUserId).subscribe({
       next: () => {
         this.snackBar.open('User deleted successfully', 'Close', { duration: 3000 });

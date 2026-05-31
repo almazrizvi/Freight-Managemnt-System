@@ -46,6 +46,13 @@
         <td mat-cell *matCellDef="let user">{{ user.fullName }}</td>
       </ng-container>
 
+      <ng-container matColumnDef="roles">
+        <th mat-header-cell *matHeaderCellDef>Roles</th>
+        <td mat-cell *matCellDef="let user">
+          {{ user.roleCodes?.length ? user.roleCodes.join(', ') : 'No roles yet' }}
+        </td>
+      </ng-container>
+
       <!-- User Type Column -->
       <ng-container matColumnDef="userType">
         <th mat-header-cell *matHeaderCellDef>Type</th>
@@ -81,6 +88,9 @@
           <button mat-icon-button [routerLink]="['/admin/users', user.id, 'edit']" 
             matTooltip="Edit user">
             <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button (click)="manageRoles(user)" matTooltip="Assign roles">
+            <mat-icon>security</mat-icon>
           </button>
           <button mat-icon-button (click)="toggleStatus(user)" 
             [matTooltip]="user.isActive ? 'Deactivate user' : 'Activate user'">

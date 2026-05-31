@@ -9,7 +9,7 @@ CREATE TABLE menu (
     level          INT,                      -- optional nesting level
     is_active      BOOLEAN       DEFAULT TRUE,
     created_at     TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
-    updated_at     TIMESTAMP     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at     TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
     
     PRIMARY KEY (menu_id),
     FOREIGN KEY (parent_id) REFERENCES menu(menu_id)

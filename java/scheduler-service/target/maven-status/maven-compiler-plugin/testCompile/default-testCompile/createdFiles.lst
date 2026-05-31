@@ -1,0 +1,5 @@
+com/freight/management/scheduler_service/service/SchedulerJobServiceTest.class
+com/freight/management/scheduler_service/job/TenantAwareQuartzJobTest.class
+com/freight/management/scheduler_service/job/TenantAwareQuartzJobTest$RecordingJob.class
+com/freight/management/scheduler_service/service/JobClassResolverTest$ExternalJob.class
+com/freight/management/scheduler_service/service/JobClassResolverTest.class

@@ -1,7 +1,10 @@
 package com.freight.management.user_service.service;
 
+import com.freight.management.core.jwt.JwtClaimNames;
 import com.freight.management.user_service.dto.LoginRequest;
 import com.freight.management.user_service.dto.LoginResponse;
+import com.freight.management.user_service.user.access.dto.AccessProfile;
+import com.freight.management.user_service.user.access.service.AccessProfileService;
 import com.freight.management.user_service.user.model.User;
 import com.freight.management.user_service.user.repository.UserRepository;
 import com.freight.management.user_service.util.JwtTokenProvider;
@@ -10,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -23,6 +27,9 @@ public class AuthService {
 
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
+
+	@Autowired
+	private AccessProfileService accessProfileService;
 
 	@Value("${jwt.expiration:3600000}")
 	private long jwtExpiration;
@@ -55,15 +62,23 @@ public class AuthService {
 			throw new Exception("Invalid password");
 		}
 
+		AccessProfile accessProfile = accessProfileService.buildAccessProfile(user);
+
 		// Generate JWT token
-		String token = jwtTokenProvider.generateToken(user.getId().toString(), user.getEmail());
+		String token = jwtTokenProvider.generateToken(
+				user.getId().toString(),
+				user.getEmail(),
+				Map.of(
+						JwtClaimNames.ROLES, accessProfile.roles(),
+						JwtClaimNames.AUTHORITIES, accessProfile.authorities()
+				)
+		);
 
 		// Build response
 		return LoginResponse.builder().token(token).userId(user.getId().toString()).email(user.getEmail())
-				.fullName(user.getFullName()).userType(user.getUserType().toString()).expiresIn(jwtExpiration / 1000) // Convert
-																														// to
-																														// seconds
-				.tokenType("Bearer").build();
+				.fullName(user.getFullName()).userType(user.getUserType()).expiresIn(jwtExpiration / 1000)
+				.tokenType("Bearer").roles(accessProfile.roles()).authorities(accessProfile.authorities())
+				.menuIds(accessProfile.menuIds()).build();
 	}
 
 	/**
@@ -84,14 +99,24 @@ public class AuthService {
 		newUser.setIsActive(true);
 
 		User savedUser = userRepository.save(newUser);
+		accessProfileService.assignDefaultRole(savedUser);
+		AccessProfile accessProfile = accessProfileService.buildAccessProfile(savedUser);
 
 		// Generate JWT token
-		String token = jwtTokenProvider.generateToken(savedUser.getId().toString(), savedUser.getEmail());
+		String token = jwtTokenProvider.generateToken(
+				savedUser.getId().toString(),
+				savedUser.getEmail(),
+				Map.of(
+						JwtClaimNames.ROLES, accessProfile.roles(),
+						JwtClaimNames.AUTHORITIES, accessProfile.authorities()
+				)
+		);
 
 		// Build response
 		return LoginResponse.builder().token(token).userId(savedUser.getId().toString()).email(savedUser.getEmail())
 				.fullName(savedUser.getFullName()).userType(savedUser.getUserType()).expiresIn(jwtExpiration / 1000)
-				.tokenType("Bearer").build();
+				.tokenType("Bearer").roles(accessProfile.roles()).authorities(accessProfile.authorities())
+				.menuIds(accessProfile.menuIds()).build();
 	}
 
 	/**

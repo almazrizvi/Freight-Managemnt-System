@@ -28,7 +28,17 @@
       <mat-menu #profileMenu="matMenu">
         <button mat-menu-item disabled *ngIf="currentUser">
           <mat-icon>person</mat-icon>
-          <span>{{ currentUser.username }}</span>
+          <span>{{ currentUser.fullName || currentUser.email }}</span>
+        </button>
+
+        <button mat-menu-item disabled *ngIf="currentUser">
+          <mat-icon>badge</mat-icon>
+          <span>{{ currentUser.email }}</span>
+        </button>
+
+        <button mat-menu-item disabled *ngIf="currentUser">
+          <mat-icon>verified_user</mat-icon>
+          <span>{{ currentUser.roles.join(', ') || currentUser.userType }}</span>
         </button>
         
         <mat-divider *ngIf="currentUser"></mat-divider>

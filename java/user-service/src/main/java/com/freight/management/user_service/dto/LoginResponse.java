@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,4 +20,10 @@ public class LoginResponse {
 	private Long expiresIn;
 	@Builder.Default
 	private String tokenType = "Bearer";
+	@Builder.Default
+	private List<String> roles = List.of();
+	@Builder.Default
+	private List<String> authorities = List.of();
+	@Builder.Default
+	private List<String> menuIds = List.of();
 }

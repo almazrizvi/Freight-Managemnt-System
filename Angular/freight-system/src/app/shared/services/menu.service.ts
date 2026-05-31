@@ -20,54 +20,64 @@ export interface MenuItem {
   providedIn: 'root'
 })
 export class MenuService {
-  private apiUrl = 'http://localhost:9090/api/menus';
+  private apiUrl = 'http://localhost:9110/api/menus';
   
   private defaultMenuItems: MenuItem[] = [
     {
+      menuId: 'shipments',
       label: 'Shipments',
       icon: 'local_shipping',
       route: '/shipments'
     },
     {
+      menuId: 'vehicles',
       label: 'Vehicles',
       icon: 'directions_car',
       route: '/vehicles'
     },
     {
+      menuId: 'customers',
       label: 'Customers',
       icon: 'people',
       route: '/customers'
     },
     {
+      menuId: 'reports',
       label: 'Reports',
       icon: 'assessment',
       route: '/reports'
     },
     {
+      menuId: 'admin',
       label: 'Admin',
       icon: 'admin_panel_settings',
       children: [
         {
+          menuId: 'admin_users',
           label: 'User Management',
           icon: 'person',
           route: '/admin/users'
         },
         {
+          menuId: 'admin_users_create',
           label: 'Create User',
           icon: 'person_add',
           route: '/admin/users/create'
         },
         {
+          menuId: 'admin_roles',
           label: 'User Roles',
           icon: 'security',
           route: '/admin/users/roles'
         },
         {
-          label: 'User Activity',
-          icon: 'history',
+          menuId: 'admin_activity',
+          label: 'Operations Monitor',
+          icon: 'monitor_heart',
           route: '/admin/users/activity'
         },
         {
+          menuId: 'admin_permissions',
           label: 'User Permissions',
           icon: 'vpn_key',
           route: '/admin/users/permissions'
@@ -122,6 +132,7 @@ export class MenuService {
     return menus.map(menu => ({
       ...menu,
       icon: menu.icon,
+      label: menu.label || menu.title,
       route: menu.route || menu.angularRoute,
       children: menu.children ? this.transformDefaultMenus(menu.children) : undefined
     }));

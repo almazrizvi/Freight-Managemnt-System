@@ -5,6 +5,8 @@ import com.freight.management.core.jwt.JwtTokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class JwtTokenProvider {
 
@@ -19,6 +21,10 @@ public class JwtTokenProvider {
 
 	public String generateToken(String userId, String email) {
 		return jwtTokenService.generateToken(userId, email);
+	}
+
+	public String generateToken(String userId, String email, Map<String, ?> extraClaims) {
+		return jwtTokenService.generateToken(userId, email, extraClaims);
 	}
 
 	public boolean validateToken(String token) {

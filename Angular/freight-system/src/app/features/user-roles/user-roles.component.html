@@ -3,69 +3,70 @@
     <button mat-icon-button (click)="goBack()" class="back-button">
       <mat-icon>arrow_back</mat-icon>
     </button>
-    <h1>User Roles Management</h1>
+    <div>
+      <h1>User Roles</h1>
+      <p>Assign one or more roles to each user. Changes save to the backend when available and fall back locally for offline work.</p>
+    </div>
   </div>
 
   <div class="roles-wrapper">
-    <div *ngIf="isLoading" class="loading">Loading roles...</div>
+    <div *ngIf="isLoading" class="loading">Loading user roles...</div>
 
-    <div class="roles-info">
-      <h2>Available Roles</h2>
-      <div class="roles-grid">
-        <div class="role-card" *ngFor="let role of roles">
-          <h3>{{ role.name }}</h3>
-          <p>{{ role.description }}</p>
-        </div>
-      </div>
-    </div>
+    <table mat-table [dataSource]="users" class="roles-table" *ngIf="!isLoading && users.length > 0">
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let user">{{ user.email }}</td>
+      </ng-container>
 
-    <div class="users-roles" *ngIf="!isLoading && users.length > 0">
-      <h2>User Role Assignments</h2>
-      <table mat-table [dataSource]="users" class="roles-table">
-        <!-- Email Column -->
-        <ng-container matColumnDef="email">
-          <th mat-header-cell *matHeaderCellDef>Email</th>
-          <td mat-cell *matCellDef="let user">{{ user.email }}</td>
-        </ng-container>
+      <ng-container matColumnDef="fullName">
+        <th mat-header-cell *matHeaderCellDef>Full Name</th>
+        <td mat-cell *matCellDef="let user">{{ user.fullName }}</td>
+      </ng-container>
 
-        <!-- Full Name Column -->
-        <ng-container matColumnDef="fullName">
-          <th mat-header-cell *matHeaderCellDef>Full Name</th>
-          <td mat-cell *matCellDef="let user">{{ user.fullName }}</td>
-        </ng-container>
+      <ng-container matColumnDef="userType">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let user">{{ user.userType }}</td>
+      </ng-container>
 
-        <!-- Roles Column -->
-        <ng-container matColumnDef="roles">
-          <th mat-header-cell *matHeaderCellDef>Roles</th>
-          <td mat-cell *matCellDef="let user">
-            <mat-form-field appearance="outline">
-              <mat-label>Select Role</mat-label>
-              <mat-select>
-                <mat-option *ngFor="let role of roles" [value]="role.id">
-                  {{ role.name }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </td>
-        </ng-container>
+      <ng-container matColumnDef="roles">
+        <th mat-header-cell *matHeaderCellDef>Roles</th>
+        <td mat-cell *matCellDef="let user">
+          <mat-form-field appearance="outline" class="roles-select">
+            <mat-select multiple [(ngModel)]="user.roleCodes">
+              <mat-option *ngFor="let role of roles" [value]="role.roleCode">
+                {{ role.roleName }} ({{ role.roleCode }})
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </td>
+      </ng-container>
 
-        <!-- Actions Column -->
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Actions</th>
-          <td mat-cell *matCellDef="let user">
-            <button mat-icon-button (click)="assignRole(user)" matTooltip="Assign role">
-              <mat-icon>check_circle</mat-icon>
-            </button>
-          </td>
-        </ng-container>
+      <ng-container matColumnDef="permissions">
+        <th mat-header-cell *matHeaderCellDef>Permission Summary</th>
+        <td mat-cell *matCellDef="let user">
+          <div class="permission-summary">{{ getPermissionSummary(user) }}</div>
+          <div class="role-badges" *ngIf="user.roleCodes?.length">
+            <span class="role-badge" *ngFor="let roleCode of user.roleCodes">{{ roleCode }}</span>
+          </div>
+        </td>
+      </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-    </div>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let user" class="actions-cell">
+          <button mat-raised-button color="primary" (click)="saveRoles(user)">Save</button>
+          <button mat-icon-button color="primary" (click)="editPermissions(user)" matTooltip="Edit permissions">
+            <mat-icon>vpn_key</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.selected-row]="isSelectedUser(row)"></tr>
+    </table>
 
     <div *ngIf="!isLoading && users.length === 0" class="no-users">
-      <p>No users to assign roles. <a [routerLink]="['/admin/users/create']">Create a user first</a></p>
+      <p>No users found. Create a user first, then assign roles here.</p>
     </div>
   </div>
 </div>
